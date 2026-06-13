@@ -1,4 +1,4 @@
-name: Deploy to cPanel
+name: Deploy to cPanel Passenger
 
 on:
   push:
@@ -18,13 +18,19 @@ jobs:
           node-version: '18.3'
           cache: 'npm'
 
+      - name: Install passenger-seat
+        run: npm install -g github:tamiopia/passenger-seat
+
       - name: Install Dependencies
         run: npm ci
 
-      - name: Build
+      - name: Build React App
         run: npm run build
         env:
           CI: false
+
+      - name: Build Passenger-Seat Bundle
+        run: passenger-seat build
 
       - name: Deploy to cPanel via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
@@ -33,6 +39,6 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftps
-          local-dir: ./build/
+          local-dir: ./passenger-seat-dist/
           server-dir: /home/tebitain/resume.tamagn.tebitainnovations.com/
           dangerous-clean-slate: false
